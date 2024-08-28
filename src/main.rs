@@ -1,10 +1,36 @@
+use rand::Rng;
+use std::cmp::Ordering;
+use std::io;
+
 fn main() {
-    // This is how panic is manually calle
-    panic!("Hello, world!");
+    println!("Guess the number!");
 
-    let nums: Vec<u64> = vec![12, 3, 45];
+    let secret_number: u32 = rand::thread_rng().gen_range(1..=100);
+    loop {
+        println!("Please input your guess.");
 
-    // This will panic becuase we are accessing an array out of bounds.
-    println!("{}", nums[20]);
-    // We can run using RUST_BACKTRACE=1 cargo run to see the backtrace
+        let mut guess: String = String::new();
+
+        io::stdin()
+            .read_line(&mut guess)
+            .expect("Failed to read line");
+
+        let guess: u32 = match guess.trim().parse() {
+            Ok(num) => num,
+            Err(_) => continue,
+        };
+
+        match guess.cmp(&secret_number) {
+            Ordering::Less => {
+                println!("Too small!");
+            }
+            Ordering::Greater => {
+                println!("Too Big!");
+            }
+            Ordering::Equal => {
+                println!("Just Right! (> . 0)");
+                break;
+            }
+        }
+    }
 }
