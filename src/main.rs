@@ -1,36 +1,16 @@
-use rand::Rng;
-use std::cmp::Ordering;
-use std::io;
+use std::{fs::File, io::ErrorKind};
 
 fn main() {
-    println!("Guess the number!");
-
-    let secret_number: u32 = rand::thread_rng().gen_range(1..=100);
-    loop {
-        println!("Please input your guess.");
-
-        let mut guess: String = String::new();
-
-        io::stdin()
-            .read_line(&mut guess)
-            .expect("Failed to read line");
-
-        let guess: u32 = match guess.trim().parse() {
-            Ok(num) => num,
-            Err(_) => continue,
-        };
-
-        match guess.cmp(&secret_number) {
-            Ordering::Less => {
-                println!("Too small!");
+    let my_file = match File::open("hello.txt") {
+        Ok(file) => file,
+        Err(e) => match e.kind() {
+            ErrorKind::NotFound => match File::create("hello.txt") {
+                Ok(new_file) => new_file,
+                Err(e) => panic!("Problim creating the file: {e:?}"),
+            },
+            other => {
+                panic!("Problem Opening the file : {other:?}");
             }
-            Ordering::Greater => {
-                println!("Too Big!");
-            }
-            Ordering::Equal => {
-                println!("Just Right! (> . 0)");
-                break;
-            }
-        }
-    }
+        },
+    };
 }
